@@ -4,6 +4,8 @@
 
 CNxLiveWindow::CNxLiveWindow()
 {
+	m_pBase = nullptr;
+
 	InitLiveWindow();
 }
 
@@ -14,12 +16,27 @@ CNxLiveWindow::~CNxLiveWindow()
 void thread_func_Live(CNxLiveWindow *p)
 {
 	CNxLiveWindow *pObj = p;
-	
+	SDL_Rect re;
+	re.x = 0;
+	re.y = 0;
+	re.h = 540;
+	re.w = 960;
 	while (true)
 	{
 		//pop queue
+		CFrameInfo *p = pObj->m_pBase->m_mapBase[0]->pop_front();
+
+		SDL_UpdateTexture(pObj->m_pTexture, &re, p->pframe->data[0], p->pframe->linesize[0]);
+
+		SDL_RenderClear(pObj->m_pRender);
+		SDL_RenderCopy(pObj->m_pRender, pObj->m_pTexture, &re, &re);
+		SDL_RenderPresent(pObj->m_pRender);
 
 	}
+}
+void CNxLiveWindow::SetQueue(CNxBase *pBase)
+{
+	m_pBase = pBase;
 }
 void CNxLiveWindow::SDLCreateWindow(HWND hwnd, RECT re)
 {
@@ -37,7 +54,7 @@ void CNxLiveWindow::SDLCreateWindow(HWND hwnd, RECT re)
 		960, 540);
 
 	//TTF
-	m_pFont = TTF_OpenFont("D:\\quanwei\\Project\\AJA_Driver\\xPlayer v1\\xPlayer_6_13\\xPlayer_6_13\\x64\\Debug64\\simkai.ttf", 20);
+	m_pFont = TTF_OpenFont("C:\\Windows\\Fonts\\simkai.ttf", 20);
 
 	TTF_SetFontStyle(m_pFont, TTF_STYLE_NORMAL);
 

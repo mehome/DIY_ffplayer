@@ -1,13 +1,8 @@
 #pragma once
 #include "NxBase.h"
 #include "CNxLogINI.h"
-extern "C"
-{
-#include "libavformat\avformat.h"
-#include "libswscale\swscale.h"
-}
-
-
+#include "DefInfo.h"
+#include "CNxQueue.h"
 class CNxStream :
 	public CNxBase
 {
@@ -25,5 +20,6 @@ public:
 	AVCodec			*m_pCodec;
 	CNxLogINI		*m_pLogInstance;
 	int				m_iIndex;
+	
 };
 

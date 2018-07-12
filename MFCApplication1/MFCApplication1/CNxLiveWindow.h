@@ -11,9 +11,11 @@ public:
 	~CNxLiveWindow();
 
 	void SDLCreateWindow(HWND hwnd,RECT re);
+	void SetQueue(CNxBase *pBase);
 private:
 	void InitLiveWindow();
 public:
+	CNxBase			*m_pBase;
 	SDL_Texture		*m_pTexture;
 	SDL_Window		*m_pWindow;
 	SDL_Renderer	*m_pRender;

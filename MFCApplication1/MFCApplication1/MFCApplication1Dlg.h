@@ -3,7 +3,9 @@
 //
 
 #pragma once
-
+#include "afxwin.h"
+#include"CNxLiveWindow.h"
+#include"CNxStream.h"
 
 // CMFCApplication1Dlg ¶Ô»°¿ò
 class CMFCApplication1Dlg : public CDialogEx
@@ -31,4 +33,8 @@ protected:
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
+public:
+	CStatic			m_LiveWindow;
+	CNxStream		m_objstream;
+	CNxLiveWindow	m_objLiveWindow;
 };

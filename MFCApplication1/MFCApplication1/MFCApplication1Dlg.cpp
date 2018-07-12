@@ -58,6 +58,7 @@ CMFCApplication1Dlg::CMFCApplication1Dlg(CWnd* pParent /*=NULL*/)
 void CMFCApplication1Dlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_STATIC_Live, m_LiveWindow);
 }
 
 BEGIN_MESSAGE_MAP(CMFCApplication1Dlg, CDialogEx)
@@ -101,6 +102,7 @@ BOOL CMFCApplication1Dlg::OnInitDialog()
 	// TODO: 在此添加额外的初始化代码
 	CNxLogINI *log = CNxLogINI::LogCreateInstance();
 	log->LogSetPath("D:\\Log.txt");
+
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }

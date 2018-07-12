@@ -21,6 +21,8 @@ bool CNxStream::regist()
 
 	m_pFormatContext = avformat_alloc_context();
 
+	InitMap(0);
+
 	return bre;
 }
 void thread_readframe(CNxStream *pParam)
@@ -29,8 +31,6 @@ void thread_readframe(CNxStream *pParam)
 
 	AVFrame *pFrame = nullptr;
 	AVFrame *pFrame_YUV = nullptr;
-
-	pFrame = av_frame_alloc();
 
 	AVPacket packet;
 	int got_picture_ptr = 0;
@@ -54,19 +54,24 @@ void thread_readframe(CNxStream *pParam)
 		{
 			if (packet.stream_index == pObj->m_iIndex)
 			{
-				avcodec_decode_video2(pObj->m_pCodecContext,
-					pFrame, &got_picture_ptr, &packet);
+				
+				got_picture_ptr  = avcodec_send_packet(pObj->m_pCodecContext, &packet);
 				if (got_picture_ptr != 0)
-				{//push queue
-					sws_scale(sc, 
-						(const uint8_t* const*)pFrame->data,
-						pFrame->linesize,
-						0,
-						pObj->m_pCodecContext->height,
-						pFrame_YUV->data,
-						pFrame_YUV->linesize);
-
+				{
+					break;
 				}
+				
+				pFrame = av_frame_alloc();
+
+				while (avcodec_receive_frame(pObj->m_pCodecContext, pFrame) == 0)
+				{
+					CFrameInfo *p = new CFrameInfo;
+					
+					p->pframe = pFrame;
+
+					pObj->Pushback(p);
+				}
+
 				av_frame_free(&pFrame);
 			}
 		}
@@ -99,18 +104,18 @@ bool CNxStream::SetOpenPath(char *ch_path)
 	//Get Codec
 	for (int i = 0; i < m_pFormatContext->nb_streams;i++)
 	{
-		if (m_pFormatContext->streams[i]->codec->codec_type == AVMEDIA_TYPE_VIDEO)
+		if (m_pFormatContext->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO)
 		{
 			m_iIndex = i;
 
 			break;
 		}
 	}
-	//
-	m_pCodecContext = m_pFormatContext->streams[m_iIndex]->codec;
-
 	//Find Decode
-	m_pCodec = avcodec_find_decoder(m_pCodecContext->codec_id);
+	m_pCodec = avcodec_find_decoder(m_pFormatContext->streams[m_iIndex]->codecpar->codec_id);
+
+	//Get CodecContex
+	m_pCodecContext = avcodec_alloc_context3(m_pCodec);
 
 	//open
 	if (avcodec_open2(m_pCodecContext, m_pCodec, nullptr) != 0)
